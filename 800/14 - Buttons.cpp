@@ -3,29 +3,33 @@ using namespace std;
 
 int main()
 {
-    int t;
+    int t; // Number of test cases
     cin >> t;
     while (t--)
     {
-        long long a, b, c;
+        long long a, b, c; // a: buttons only Anna can press, b: buttons only Katie can press, c: buttons either can press
         cin >> a >> b >> c;
+        
+        // Check if the number of buttons that can be pressed by either is odd
         if (c % 2 == 1) // odd
         {
-            if (b > a) // 1
-                cout << "Second" << endl;
+            // If c is odd, the player with more exclusive buttons will win
+            if (b > a) // Katie has more exclusive buttons
+                cout << "Second" << endl; // Katie wins
             else
-                cout << "First" << endl;
+                cout << "First" << endl; // Anna wins
         }
         else // even
         {
-            if (a > b) // 1
-                cout << "First" << endl;
+            // If c is even, the player with more exclusive buttons will win
+            if (a > b) // Anna has more exclusive buttons
+                cout << "First" << endl; // Anna wins
             else
-                cout << "Second" << endl;
+                cout << "Second" << endl; // Katie wins
         }
     }
     return 0;
 }
 
-// tc - O(1)
-// sc - O(1)
+// Time Complexity (TC): O(1)
+// Space Complexity (SC): O(1)
