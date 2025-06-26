@@ -3,20 +3,20 @@ using namespace std;
 
 int main()
 {
-    int t; // Declare an integer t to store the number of test cases
-    cin >> t; // Read the number of test cases from standard input
-    while (t--) // Loop over each test case
+    int t;
+    cin >> t;
+    while (t--)
     {
-        long long n; // Declare a long long integer n to store the current integer for the test case
-        cin >> n; // Read the integer n from standard input
-        // Check if n is divisible by 3
-        if (n % 3 == 0) // If n is divisible by 3, Vova wins
-            cout << "Second" << endl; // Output "Second" indicating Vova wins
+        long long n;
+        cin >> n;
+        // input
+        if (n % 3 == 0) // if n is divisible by 3
+            cout << "Second" << endl;
         else
-            cout << "First" << endl; // Output "First" indicating Vanya wins
+            cout << "First" << endl;
     }
-    return 0; // Return 0 to indicate successful execution
+    return 0;
 }
 
-// Time Complexity (TC): O(1)
-// Space Complexity (SC): O(1)
+// tc - O(1)
+// sc - O(1)

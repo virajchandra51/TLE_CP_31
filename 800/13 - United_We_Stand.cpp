@@ -3,42 +3,37 @@ using namespace std;
 
 int main()
 {
-    int t; // Number of test cases
+    int t;
     cin >> t;
     while (t--)
     {
-        long long n; // Length of array a
+        long long n;
         cin >> n;
-        vector<long long> a(n); // Array a of length n
-        for (int i = 0; i < n; i++) // Read elements of array a
+        vector<long long> a(n);
+        for (int i = 0; i < n; i++) // n
             cin >> a[i];
 
-        // Find the maximum element in array a
-        long long mx = *max_element(a.begin(), a.end());
-        vector<long long> b, c; // Arrays b and c
-        for (int i = 0; i < n; i++) // Distribute elements into b and c
+        long long mx = *max_element(a.begin(), a.end()); // n
+        vector<long long> b, c;
+        for (int i = 0; i < n; i++) // n
         {
             if (a[i] != mx)
-                b.push_back(a[i]); // Add to b if not the maximum
+                b.push_back(a[i]);
             else
-                c.push_back(a[i]); // Add to c if it is the maximum
+                c.push_back(a[i]);
         }
 
-        // Check if array b is empty, meaning all elements were the same
-        if (b.size() == 0) // All elements are the same and hence max
+        if (b.size() == 0) //  all elements are same and hence max
         {
-            cout << -1 << endl; // No valid distribution possible
+            cout << -1 << endl;
         }
         else
         {
-            // Output the sizes of arrays b and c
             cout << b.size() << " " << c.size() << endl;
-            // Output elements of array b
-            for (auto it : b)
+            for (auto it : b) // n
                 cout << it << " ";
             cout << endl;
-            // Output elements of array c
-            for (auto it : c)
+            for (auto it : c) // n
                 cout << it << " ";
             cout << endl;
         }
@@ -46,5 +41,5 @@ int main()
     return 0;
 }
 
-// Time Complexity (TC): O(n) = O(100)
-// Space Complexity (SC): O(n) = O(100)
+// tc - O(n) - O(100)
+// sc - O(n) - O(100)

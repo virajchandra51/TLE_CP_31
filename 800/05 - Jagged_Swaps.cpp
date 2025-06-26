@@ -3,24 +3,24 @@ using namespace std;
 
 int main()
 {
-    int t; // Declare a variable to store the number of test cases
-    cin >> t; // Read the number of test cases
-    while (t--) // Loop through each test case
+    int t;
+    cin >> t;
+    while (t--)
     {
-        long long n; // Declare a variable to store the size of the permutation
-        cin >> n; // Read the size of the permutation
-        long long a[n]; // Declare an array to store the permutation elements
-        for (int i = 0; i < n; i++) // Loop to read the permutation elements
-            cin >> a[i]; // Read each element of the permutation
+        long long n;
+        cin >> n;
+        long long a[n];
+        for (int i = 0; i < n; i++) // n
+            cin >> a[i];
         // input
 
-        if (a[0] == 1) // Check if the first element of the permutation is 1
-            cout << "YES" << endl; // If true, print "YES"
+        if (a[0] == 1) // 1
+            cout << "YES" << endl;
         else
-            cout << "NO" << endl; // Otherwise, print "NO"
+            cout << "NO" << endl;
     }
-    return 0; // Return 0 to indicate successful execution
+    return 0;
 }
 
-// Time Complexity (TC): O(n) = O(10)
-// Space Complexity (SC): O(n) = O(10)
+// tc - O(n) = O(10)
+// sc - O(n) = O(10)

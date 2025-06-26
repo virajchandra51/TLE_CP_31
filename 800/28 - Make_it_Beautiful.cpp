@@ -3,35 +3,35 @@ using namespace std;
 
 int main()
 {
-    int t; // Number of test cases
+    int t;
     cin >> t;
     while (t--)
     {
-        long long n; // Number of elements in the array
+        long long n;
         cin >> n;
-        long long a[n]; // Array to store the elements
-        for (int i = 0; i < n; i++) // Read n elements into the array
+        long long a[n];
+        for (int i = 0; i < n; i++) // n
             cin >> a[i];
-        // Inputs are now stored in array a
+        // inputs
 
-        sort(a, a + n); // Sort the array in non-decreasing order
-        long long max_number = a[n - 1]; // Maximum element in the array
-        long long min_number = a[0]; // Minimum element in the array
-        if (max_number == min_number) // Check if all elements are the same
+        sort(a, a + n); // nlogn
+        long long max_number = a[n - 1];
+        long long min_number = a[0];
+        if (max_number == min_number)
         {
-            cout << "NO" << endl; // If all elements are the same, it's impossible to make it beautiful
+            cout << "NO" << endl;
         }
         else
         {
-            cout << "YES" << endl; // It is possible to reorder to make it beautiful
-            cout << max_number << " "; // Start with the maximum element
-            for (int i = 0; i < n - 1; i++) // Print the rest of the elements
+            cout << "YES" << endl;
+            cout << max_number << " ";
+            for (int i = 0; i < n - 1; i++) // n
                 cout << a[i] << " ";
-            cout << endl; // End of the current test case output
+            cout << endl;
         }
     }
     return 0;
 }
 
-// Time Complexity (TC): O(nlogn) + O(n) = O(nlogn) = O(50) = O(50*log2(50)) = O(50*6) = O(300)
-// Space Complexity (SC): O(n) = O(50)
+// tc : O(nlogn) + O(n) = O(nlogn) = O(50) = O(50*log2(50)) = O(50*6) = O(300)
+// sc : O(n) = O(50)

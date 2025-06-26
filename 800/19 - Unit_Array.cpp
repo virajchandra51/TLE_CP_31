@@ -3,20 +3,20 @@ using namespace std;
 
 int main()
 {
-    int t; // Number of test cases
+    int t;
     cin >> t;
     while (t--)
     {
-        long long n; // Length of the array
+        long long n;
         cin >> n;
-        long long a[n]; // Array to store elements
-        for (long long i = 0; i < n; i++) // Loop to read array elements
+        long long a[n];
+        for (long long i = 0; i < n; i++) // n
             cin >> a[i];
-        // Input complete
+        // input
 
-        long long positive_count = 0; // Count of +1s in the array
-        long long negative_count = 0; // Count of -1s in the array
-        for (long long i = 0; i < n; i++) // Loop to count +1s and -1s
+        long long positive_count = 0;
+        long long negative_count = 0;
+        for (long long i = 0; i < n; i++) // n
         {
             if (a[i] == 1)
                 positive_count++;
@@ -24,19 +24,18 @@ int main()
                 negative_count++;
         }
 
-        long long operations = 0; // Number of operations needed to make the array good
-        // While the sum of the array is negative or the product condition is not met
-        while (positive_count < negative_count || negative_count % 2 == 1) // Loop to make array good
+        long long operations = 0;
+        while (positive_count < negative_count || negative_count % 2 == 1) // n
         {
-            operations++; // Increment operations as we convert a -1 to 1
-            positive_count++; // Increase count of +1s
-            negative_count--; // Decrease count of -1s
+            operations++; // i have converted a -1 to 1
+            positive_count++;
+            negative_count--;
         }
 
-        cout << operations << endl; // Output the result for the current test case
+        cout << operations << endl;
     }
     return 0;
 }
 
-// Time Complexity (TC): O(n) = O(100)
-// Space Complexity (SC): O(n) = O(100)
+// tc - O(n) = O(100)
+// sc - O(n) = O(100)

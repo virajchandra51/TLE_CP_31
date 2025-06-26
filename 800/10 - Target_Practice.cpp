@@ -1,8 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Predefined score matrix representing the target's rings
-// Each element represents the score for that position on the target
 const int score[10][10] = {
 	{1,1,1,1,1,1,1,1,1,1},
 	{1,2,2,2,2,2,2,2,2,1},
@@ -18,37 +16,37 @@ const int score[10][10] = {
 
 int main()
 {
-    int t; // Number of test cases
+    int t;
     cin >> t;
     while (t--)
     {
-        char a[10][10]; // 10x10 grid to store the target for each test case
-        for (int i = 0; i < 10; i++) // Loop through each row of the grid
+        char a[10][10];
+        for (int i = 0; i < 10; i++) // 10
         {
             string s;
-            cin >> s; // Read each row as a string
-            for (int j = 0; j < 10; j++) // Loop through each column of the grid
+            cin >> s;
+            for (int j = 0; j < 10; j++) // 10
             {
-                a[i][j] = s[j]; // Store each character in the grid
+                a[i][j] = s[j];
             }
         }
-        // Input for the current test case is now stored in 'a'
+        // input
 
-        int total_score = 0; // Variable to accumulate the total score for the current test case
-        for (int i = 0; i < 10; i++) // Loop through each row of the grid
+        int total_score = 0;
+        for (int i = 0; i < 10; i++) // 10
         {
-            for (int j = 0; j < 10; j++) // Loop through each column of the grid
+            for (int j = 0; j < 10; j++) // 10
             {
-                if (a[i][j] == 'X') // Check if there is an arrow at this position
+                if (a[i][j] == 'X')
                 {
-                    total_score += score[i][j]; // Add the score for this position to the total score
+                    total_score += score[i][j];
                 }
             }
         }
-        cout << total_score << endl; // Output the total score for the current test case
+        cout << total_score << endl;
     }
     return 0;
 }
 
-// Time Complexity (TC): O(n^2) = O(100)
-// Space Complexity (SC): O(10*10) = O(100)
+// tc - O(n^2) = O(100)
+// sc - O(10*10) = O(100)
