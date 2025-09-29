@@ -2,93 +2,84 @@
 
 using namespace std;
 
-int a[200000];
-int pre[30][200001];
+void solve() {
+	int n;
+	cin >> n;
+	string s;
+	cin >> s;
 
-int range_and(int l, int r) // returns the bitwise AND of all elements from a[l] to a[r]
-{
-    int ans = 0;
-    for (int i = 0; i < 30; i++) // O(logA)
-    {
-        if (pre[i][r + 1] - pre[i][l] == 0)
-        {
-            ans += (1 << i);
-        }
-    }
-    return ans;
+	int bal[n]; // O(n) space
+	if(s[0] == '(') {
+		bal[0] = 1;
+	}
+	else{
+		bal[0] = -1;
+	}
+	
+	for(int i = 1; i < n; i++) { // O(n) time
+		if(s[i] == ')') {
+			bal[i] = bal[i-1] - 1;
+		}
+		else{
+			bal[i] = bal[i-1] + 1;
+		}
+	}
+
+	if(bal[n-1] != 0) {
+		cout << -1 << endl;
+		return;
+	}
+
+	if(*min_element(bal,bal+n) == 0) { //O(n) time
+		cout << 1 << endl;
+		for(int i = 0; i < n; i++) {
+			cout << 1 << ' ';
+		}
+		cout << endl;
+		return;
+	}
+	else if(*max_element(bal,bal+n) == 0) { //O(n) time
+		cout << 1 << endl;
+		for(int i = 0; i < n; i++) {
+			cout << 1 << ' ';
+		}
+		cout << endl;
+		return;
+	}
+
+	int ans[n];
+
+	for(int i = 0; i < n; i++) { // O(n) time
+		if(bal[i] > 0) {
+			ans[i] = 1;
+		}
+		else if(bal[i] < 0) {
+			ans[i] = 2;
+		}
+		else{
+			if(bal[i-1] > 0) {
+				ans[i] = 1;
+			}
+			else{
+				ans[i] = 2;
+			}
+		}
+	}
+
+	cout << 2 << endl;
+	for(int i = 0; i < n; i++) {
+		cout << ans[i] << ' ';
+	}
+	cout << endl;
 }
 
-void solve()
-{
-    int n;
-    cin >> n;
-    for (int i = 0; i < n; i++)
-    {
-        cin >> a[i];
-    }
-
-    for (int j = 0; j < 30; j++) // O(logA)
-    {
-        pre[j][0] = 0;
-        for (int i = 0; i < n; i++) // O(n)
-        {
-            if ((1 << j) & a[i])
-            {
-                pre[j][i + 1] = pre[j][i];
-            }
-            else
-            {
-                pre[j][i + 1] = pre[j][i] + 1;
-            }
-        }
-    }
-
-    int q;
-    cin >> q;
-
-    while (q--) // O(q)
-    {
-        int l, k;
-        cin >> l >> k;
-        l--;
-
-        if (a[l] < k)
-        {
-            cout << -1 << ' ';
-            continue;
-        }
-
-        int low = l, high = n - 1;
-        while (low < high) // O(logn)
-        {
-            int mid = (low + high + 1) / 2;
-            if (range_and(l, mid) >= k) // O(logA)
-            {
-                low = mid;
-            }
-            else
-            {
-                high = mid - 1;
-            }
-        }
-        cout << low + 1 << ' ';
-    }
-    cout << '\n';
+int main () {
+	int t;
+	cin >> t;
+	for(int i = 0; i < t; i++) {
+		solve();
+	}
 }
 
-int main()
-{
-    cin.tie(NULL);
-    cout.tie(NULL);
-    cin.sync_with_stdio(false);
-
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
-}
-
-// TC: O(n * logA + q * logn * logA)
-// SC: O(n * logA)
+// TC: O(n)
+// SC: O(n)
