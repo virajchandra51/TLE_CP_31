@@ -12,8 +12,10 @@ int main()
             cout << -1 << '\n';
         else
         {
-            long long min_buses = ceil(n * 1.0 / 6); // 1
-            long long max_buses = n / 4;
+            // Using a different formula for ceil and floor to avoid floating point operations
+            // in C++20 (GCC 13-64) version 
+            long long min_buses = (n + 5) / 6; // integer ceil of n/6
+            long long max_buses = n / 4;       // integer floor of n/4
             cout << min_buses << " " << max_buses << '\n';
         }
     }
