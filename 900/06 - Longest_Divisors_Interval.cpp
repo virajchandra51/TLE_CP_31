@@ -6,12 +6,12 @@ using namespace std;
 
 int main()
 {
-    long long a = 1;
-    for (long long i = 2; i <= 50; i++)
-    {
-        a = lcm(a, i);
-    }
-    cout << a << endl;
+    // long long a = 1;
+    // for (long long i = 2; i <= 50; i++)
+    // {
+    //     a = lcm(a, i);
+    // }
+    // cout << a << endl;
 
     int t;
     cin >> t;
