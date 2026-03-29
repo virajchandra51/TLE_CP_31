@@ -1,113 +1,62 @@
-#include<bits/stdc++.h>
-
-#define endl '\n'
-
+#include <bits/stdc++.h>
 using namespace std;
+using ll = long long;
+const ll MOD = 1000000007;
 
-typedef long long LL;
+vector<vector<int>> g;
+vector<ll> weights;
 
-struct H{int x, y;};
-
-int ii, n;
-const int q = 1e9 + 7;
-LL p[100005], pv[100005], vi[100005], w[100005];
-H e[200040];
-
-int C(H a, H b){return a.x < b.x;}
-int G(LL a, LL b){return a > b;}
-
-LL dfs(int v)
-{
-    LL d = 1;
-
-    vi[v] = 1;
-
-    for(int i = pv[v]; i < pv[v+1]; i++)
-	if(!vi[e[i].y])
-	    d += dfs(e[i].y);
-
-    w[ii] = d * (n - d);
-    ii++;
-
-    return d;
-}
-
-main()
-{
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
-
-    int t;
-
-    cin >> t;
-
-    for(;t--;)
-    {
-	int k = 0, m;
-	LL x = 1;
-
-	cin >> n;
-
-	for(int i = 0; i < n - 1; i++)
-	{
-	    cin >> e[i].x >> e[i].y;
-	    e[i + n - 1].x = e[i].y;
-	    e[i + n - 1].y = e[i].x;
-	}
-
-	int sz = 2 * n - 2;
-
-	sort(e, e + sz, C);
-
-	for(int i = 1; i < sz; i++)
-	{
-	    if(e[i].x > e[i - 1].x)
-	    {
-		for(int j = e[i - 1].x + 1; j <= e[i].x; j++)
-		    pv[j] = i;
-	    }
-	}
-	for(int j = e[sz - 1].x + 1; j <= n + 2; j++)
-	    pv[j] = sz;
-
-	ii = k = 0;
-	dfs(1);
-
-	cin >> m;
-
-	for(int i = 0; i < m; i++)
-	    cin >> p[i];
-
-	sort(p, p + m, G);
-	sort(w, w + n - 1, G);
-
-	if(m < n)
-	    for(int i = m; i < n - 1; i++)
-		p[i] = 1;
-	else
-	{
-	    int i;
-
-	    for(i = m - 1; i > m - n; k = i, i--)
-		w[i] = w[i - m + n - 1];
-
-	    for(; i; i--)
-		w[i] = w[0];
-	}
-
-	int l = max(m, n - 1);
-	
-	int i;
-	for(i = 0, x = w[0]; i <= k; i++)
-	    x = x * p[i] % q;
-
-	for(;i < l; i++)
-	    x = (x + w[i] * p[i]) % q;
-
-	cout << x << endl;
-
-	for(int i = 1; i <= n; i++)
-	    vi[i] = 0;
+int dfs(int u, int p, int n){
+    int sz = 1;
+    for(int v : g[u]) if(v != p){
+        int s = dfs(v, u, n);
+        weights.push_back(1LL * s * (n - s));
+        sz += s;
     }
+    return sz;
 }
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int T; cin >> T;
+    while(T--){
+        int n; cin >> n;
+        g.assign(n+1, {});
+        for(int i=0;i<n-1;i++){
+            int u,v; cin >> u >> v;
+            g[u].push_back(v);
+            g[v].push_back(u);
+        }
+
+        weights.clear();
+        dfs(1, -1, n);
+        sort(weights.begin(), weights.end());
+
+        int m; cin >> m;
+        vector<ll> f;
+        // Pad with ones
+        while((int)f.size() < n-1-m) f.push_back(1);
+        for(int i=0;i < m;i++) {ll x; cin >> x; f.push_back(x);}
+        sort(f.begin(), f.end());
+
+        // shrink to size n-1 by merging largest
+        while((int)f.size() > n-1){
+            ll x = f.back(); f.pop_back();
+            f.back() = (f.back() * x) % MOD;
+        }
+
+        ll ans = 0;
+        for(int i=0;i<n-1;i++){
+            ans = (ans + (weights[i] % MOD) * (f[i] % MOD)) % MOD;
+        }
+        cout << ans << "\n";
+    }
+    return 0;
+}
+
+/*
+TC: O(n log n + m log m) per test.
+SC: O(n + m).
+*/

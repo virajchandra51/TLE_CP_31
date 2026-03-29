@@ -1,40 +1,62 @@
 #include <bits/stdc++.h>
-
 using namespace std;
-
-int main() {
-  auto check = [](const string& s) {
-    int bal = 0;
-    for (char c : s) {
-      if (c == '(') ++bal;
-      if (c == ')') --bal;
-      if (bal < 0) return false;
-    }
-    return bal == 0;
-  };
-  
-  ios::sync_with_stdio(false); cin.tie(0);
-  int t;
-  cin >> t;
-  while (t--) {
+void solve()
+{
     string s;
     cin >> s;
-    vector<int> pos;
-    int op = s.size() / 2, cl = s.size() / 2;
-    for (int i = 0; i < s.size(); ++i) {
-      if (s[i] == '?') pos.push_back(i);
-      if (s[i] == '(') --op;
-      if (s[i] == ')') --cl;
+    int n = s.size();
+    int opens = n / 2;
+    for (int i = 0; i < n; i++)
+    {
+        if (s[i] == '(')
+            opens--;
     }
-    for (int i = 0; i < pos.size(); ++i) {
-      if (i < op) s[pos[i]] = '(';
-      else s[pos[i]] = ')';
+    int last_open = -1, first_close = -1;
+    for (int i = 0; i < n; i++)
+    {
+        if (s[i] == '?' && opens > 0)
+        {
+            last_open = i;
+            s[i] = '(';
+            opens--;
+        }
+        else if (s[i] == '?')
+        {
+            s[i] = ')';
+            first_close = (first_close != -1) ? first_close : i;
+        }
     }
-    bool ok = true;
-    if (op > 0 && cl > 0) {
-      swap(s[pos[op - 1]], s[pos[op]]);
-      if (check(s)) ok = false;
+    if (last_open == -1 || first_close == -1)
+    {
+        cout << "YES\n";
+        return;
     }
-    cout << (ok ? "YES\n" : "NO\n");
-  }
-} 
+    swap(s[last_open], s[first_close]);
+    int balance = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (s[i] == '(')
+            balance++;
+        else
+            balance--;
+        if (balance < 0)
+        {
+            cout << "YES\n";
+            return;
+        }
+    }
+    cout << "NO\n";
+}
+signed main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    int t = 1;
+    cin >> t;
+    while (t--)
+        solve();
+    return 0;
+}
+
+// Time Complexity: O(n)
+// Space Complexity: O(n)

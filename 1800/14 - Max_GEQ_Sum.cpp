@@ -1,98 +1,103 @@
-#include <bits/stdc++.h>
-typedef long long ll;
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <algorithm>
+#include <limits>
+
 using namespace std;
- 
-const ll ninf = -1e15;
- 
-vector<int> nextGreater(vector<ll>& arr, int n) {
-	stack<int> s;	
-        vector<int> result(n, n);
-	for (int i = 0; i < n; i++) {
-		while (!s.empty() && arr[s.top()] < arr[i]) {
-			result[s.top()] = i;	
-			s.pop();
-		}
-		s.push(i);
-	}
-        return result;
+
+using ll = long long;
+const ll INF = numeric_limits<ll>::min();
+
+struct SegmentTree {
+    int n;
+    vector<ll> tree;
+
+    SegmentTree(const vector<ll>& arr) {
+        n = arr.size();
+        tree.resize(4 * n);
+        build(arr, 0, 0, n - 1);
+    }
+
+    void build(const vector<ll>& arr, int v, int tl, int tr) {
+        if (tl == tr) {
+            tree[v] = arr[tl];
+        } else {
+            int tm = (tl + tr) / 2;
+            build(arr, 2 * v + 1, tl, tm);
+            build(arr, 2 * v + 2, tm + 1, tr);
+            tree[v] = max(tree[2 * v + 1], tree[2 * v + 2]);
+        }
+    }
+
+    ll query(int l, int r) {
+        if (l > r) return INF;
+        return query_recursive(0, 0, n - 1, l, r);
+    }
+
+    ll query_recursive(int v, int tl, int tr, int l, int r) {
+        if (l > r) return INF;
+        if (l == tl && r == tr) return tree[v];
+        int tm = (tl + tr) / 2;
+        return max(
+            query_recursive(2 * v + 1, tl, tm, l, min(r, tm)),
+            query_recursive(2 * v + 2, tm + 1, tr, max(l, tm + 1), r)
+        );
+    }
+};
+
+string solve() {
+    int n;
+    cin >> n;
+    vector<ll> a(n);
+    for (int i = 0; i < n; ++i) cin >> a[i];
+
+    vector<int> x(n, -1), y(n, n);
+    stack<int> s_pge, s_nge;
+
+    for (int i = 0; i < n; ++i) {
+        while (!s_pge.empty() && a[s_pge.top()] <= a[i]) s_pge.pop();
+        if (!s_pge.empty()) x[i] = s_pge.top();
+        s_pge.push(i);
+    }
+
+    for (int i = n - 1; i >= 0; --i) {
+        while (!s_nge.empty() && a[s_nge.top()] < a[i]) s_nge.pop();
+        if (!s_nge.empty()) y[i] = s_nge.top();
+        s_nge.push(i);
+    }
+
+    vector<ll> ps(n + 1, 0), ss(n + 1, 0);
+    for (int i = 0; i < n; ++i) ps[i + 1] = ps[i] + a[i];
+    for (int i = n - 1; i >= 0; --i) ss[i] = ss[i + 1] + a[i];
+
+    SegmentTree ps_tree(ps);
+    SegmentTree ss_tree(ss);
+
+    for (int k = 0; k < n; ++k) {
+        int l = x[k] + 1;
+        int r = y[k] - 1;
+
+        ll max_suffix_val = ss_tree.query(l, k);
+        if (max_suffix_val > a[k] + ss[k + 1]) return "NO";
+
+        ll max_prefix_val = ps_tree.query(k + 1, r + 1);
+        if (max_prefix_val > a[k] + ps[k]) return "NO";
+    }
+
+    return "YES";
 }
- 
-vector<int> prevGreater(vector<ll>& arr, int n) {
-	stack<int> s;	
-        vector<int> result(n, -1);
-	for (int i = n - 1; i >= 0; i--) {
-		while (!s.empty() && arr[s.top()] < arr[i]) {
-			result[s.top()] = i;	
-			s.pop();
-		}
-		s.push(i);
-	}
-        return result;
-}
- 
-ll query(vector<ll> &tree, int node, int ns, int ne, int qs, int qe) {
-    if (qe < ns || qs > ne) return ninf;
-    if (qs <= ns && ne <= qe) return tree[node];
- 
-    int mid = ns + (ne - ns) / 2;
-    ll leftQuery = query(tree, 2 * node, ns, mid, qs, qe);
-    ll rightQuery = query(tree, 2 * node + 1, mid + 1, ne, qs, qe);
-    return max(leftQuery, rightQuery);
-}
- 
+
 int main() {
-   int t; 
-   cin >> t;
-   while (t--) {
-        int n, _n;
-        cin >> n;
-        vector<ll> arr(n, 0);
-        for (auto& a : arr)
-            cin >> a;
-        
-        // Round off n to next power of 2
-        _n = n;
-        while (__builtin_popcount(_n) != 1) _n++;
- 
- 
-        // Prefix sums
-        vector<ll> prefixSum(n, 0), suffixSum(n, 0);
-        prefixSum[0] = arr[0];
-        for (int i = 1; i < n; i++) {
-            prefixSum[i] = prefixSum[i - 1] + arr[i];
-        }
-        suffixSum[n - 1] = arr[n - 1];
-        for (int i = n - 2; i >= 0; i--) {
-            suffixSum[i] = suffixSum[i + 1] + arr[i];
-        }
-        
-        // Two max-segtress, one on the prefix sums, one on the suffix sums
-        vector<ll> prefixTree(2 * _n, ninf), suffixTree(2 * _n, ninf);
- 
-        for (int i = 0; i < n; i++) {
-            prefixTree[_n + i] = prefixSum[i];
-            suffixTree[_n + i] = suffixSum[i];
-        }
- 
-        for (int i = _n - 1; i >= 1; i--) {
-            prefixTree[i] = max(prefixTree[2 * i], prefixTree[2 * i + 1]);
-            suffixTree[i] = max(suffixTree[2 * i], suffixTree[2 * i + 1]);
-        }        
-        vector<int> ng = nextGreater(arr, n); 
-        vector<int> pg = prevGreater(arr, n); 
-        bool flag = true;
- 
-        for (int i = 0; i < n; i++) {
-            ll rightMax = query(prefixTree, 1, 0, _n - 1, i + 1, ng[i] - 1) - prefixSum[i];
-            ll leftMax = query(suffixTree, 1, 0, _n - 1, pg[i] + 1, i - 1) - suffixSum[i];
-            if (max(leftMax, rightMax) > 0) {
-                flag = false;
-                break;
-            }
-        }
-        if (flag) 
-            cout << "YES\n";
-        else 
-            cout << "NO\n";
-   }
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    ll t = 1;
+    cin >> t;
+    while(t--)
+        cout << solve() << endl;
+
+    return 0;
 }
+
+// Time Complexity: O(n log n) per test case due to segment tree queries.
+// Space Complexity: O(n) for storing arrays and segment trees.

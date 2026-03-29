@@ -1,146 +1,93 @@
-#include<bits/stdc++.h> 
+#include <bits/stdc++.h>
+using ll = long long;
 using namespace std;
 
-#define int long long
-#define vi vector<int>
-#define pii pair<int,int>
-#define x first
-#define y second
-#define fr(i,a,b) for(int i=a;i<b;i++)
-#define frn for(int i=0;i<n;i++)
-#define pb push_back
-#define all(x) (x).begin(), (x).end()
-template <typename T>istream&operator>>(istream& in, vector<T>& a){for (int i = 0; i < a.size(); ++i)in >> a[i];return in;}
-template <typename T>ostream&operator<<(ostream& out,vector<T>& a){for (int i = 0; i < a.size(); ++i) out << a[i] << " ";out << "\n";return out;}
+vector<ll> parent;
+vector<ll> sz;
 
-#ifdef AKLOCAL
-#include "dbg.hpp"
-#define dbg(x...) cerr << "[" << #x << "] = ["; _print(x)
-#else
-#define dbg(x...)
-#define endl '\n'
-#endif
+void make_set(ll v) {
+    parent[v] = v;
+    sz[v] = 1;
+}
 
-class dsu_chan
-{
-    /*
-        tc: 
-            O(n a(n)) amortized
-            O(n log(n)) for rollbackable
+ll find_set(ll v) {
+    if (v == parent[v])
+        return v;
+    return parent[v] = find_set(parent[v]);
+}
 
-        info:
-            par[u] stores leader of u
-            siz[u] stores size of component with leader u
-
-        modify:
-            to make rollbackable, we do not make modifications in get() [which makes the get() function O(log(N))] 
-            and store change info in unite()
-    */
-public:
-    int n;
-    vector<int> par;
-    vector<int> siz;
-    dsu_chan(int n) : n(n), par(n), siz(n, 1)
-    {
-        iota(par.begin(), par.end(), 0);
-    };
-    
-    int get(int x)
-    {
-        return (par[x] == x ? x : par[x] = get(par[x]));
+void union_sets(ll a, ll b) {
+    a = find_set(a);
+    b = find_set(b);
+    if (a != b) {
+        if (sz[a] < sz[b])
+            swap(a, b);
+        parent[b] = a;
+        sz[a] += sz[b];
     }
-
-    void unite(int x, int y)
-    {
-        x = get(x), y = get(y);
-        if(x == y)
-            return;
-        if(siz[x] > siz[y]) swap(x, y);
-        par[x] = y, siz[y] += siz[x];
-    }
-
-    vector<vector<int>> group()
-    {
-        vector<vector<int>> g(n);
-        for(int u = 0; u < n; u ++)
-            g[get(u)].push_back(u);
-        return g;
-    }
+}
+struct Edge {
+    ll u, v, w;
 };
 
-void solve()
-{
-    int n,m,k;
-    cin>>n>>m>>k;
+void solve() {
+    ll n, m, k;
+    cin >> n >> m >> k;
 
-    vector<pair<int,pair<int,int>>> el(m);
-    for(int i=0;i<m;i++)
-    {
-        int a,b;
-        cin>>a>>b;
-        a--,b--;
-        int c;
-        cin>>c;
-        el[i]={c,{a,b}};
+    parent.resize(n + 1);
+    sz.resize(n + 1);
+    for (ll i = 1; i <= n; i++) {
+        make_set(i);
     }
-    sort(all(el));
-    auto el1=el;
-    vector<pair<int,pair<int,int>>>el2;
-    for(int i=0;i<m;i++)
-    {
-        el1[i].x=max(0ll,el[i].x-k);
+
+    vector<Edge> edges(m);
+    for (int i = 0; i < m; i++) {
+        cin >> edges[i].u >> edges[i].v >> edges[i].w;
     }
-    
-    for(int i=0;i<m;i++)
-    {   
-        if(el[i].x<=k)
-        {
-            el2.push_back({k-el[i].x,{el[i].y}});
-        }
-    }   
-    int ans1=0, ans2=1e18, ans3=1e18;
-    dsu_chan d1(n);
-    sort(all(el1));
-    for(int i=0;i<m;i++)
-    {
-        int wt=el1[i].first;
-        auto [u,v]=el1[i].y;
-        if(wt) ans2=min(ans2,wt);
-        if(d1.get(u)!=d1.get(v))
-        {
-            d1.unite(u,v);
-            ans1+=wt;
+
+    sort(edges.begin(), edges.end(), [&](const Edge& a, const Edge& b) {
+        return a.w < b.w;
+    });
+
+    ll ans = 0;
+    const ll INF = 9e18;
+
+    for (const auto& e : edges) {
+        if (e.w < k && find_set(e.u) != find_set(e.v)) {
+            union_sets(e.u, e.v);
         }
     }
-    dbg(el2);
-    if(ans1==0) ans1=ans2;
-    int edges=0;
-    dsu_chan d2(n);
-    sort(all(el2));
-    for(int i=0;i<el2.size();i++)
-    {
-        int wt=el2[i].x;
-        auto [u,v]=el2[i].y;
-        if(d2.get(u)!=d2.get(v))
-        {
-            dbg(u,v);
-            d2.unite(u,v);
-            ans3=min(ans3,wt);
-            edges++;
+
+    bool taken_edge_above_k = false;
+    ll min_cost = INF;
+
+    for (const auto& e : edges) {
+        min_cost = min(min_cost, abs(k - e.w));
+
+        if (e.w >= k && find_set(e.u) != find_set(e.v)) {
+            ans += (e.w - k);
+            union_sets(e.u, e.v);
+            taken_edge_above_k = true;
         }
     }
-    if(edges==n-1) {}
-    else ans3=1e18;
-    cout<<min(ans1,ans3)<<endl;
-}           
 
-signed main(){
-    ios_base::sync_with_stdio(false);   
-    cin.tie(NULL); cout.tie(NULL);
+    if (!taken_edge_above_k) {
+        ans = min_cost;
+    }
 
-    int T = 1;          
-    cin>>T;
-    for(int i=1;i<=T;i++) solve();
+    cout << ans << "\n";
+}
 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+
+    int t = 1;
+    cin >> t;
+    while (t--) {
+        solve();
+    }
     return 0;
 }
+// Time Complexity: O(m log m + m α(n)) per test case, where α is the inverse Ackermann function.
+// Space Complexity: O(n + m) per test case.

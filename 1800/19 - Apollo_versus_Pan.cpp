@@ -1,52 +1,60 @@
 #include <bits/stdc++.h>
-
+#define int long long
+const int mod = 1e9 + 7;
+using vi = std::vector<int>;
 using namespace std;
-
-typedef long long int LL;
-
-const int N = 500 * 1000 + 7;
-const int P = 60;
-const int MX = 1e9 + 7;
-
-int n;
-LL in[N];
-int cnt[P];
-
-void solve(){
-	scanf("%d", &n);
-	for(int i = 0; i < P; ++i)
-		cnt[i] = 0;
-	
-	for(int i = 1; i <= n; ++i){
-		scanf("%lld", &in[i]);
-		for(int j = 0; j < P; ++j)
-			cnt[j] += in[i] >> j & 1;
-	}
-	
-	int ans = 0;
-	for(int i = 1; i <= n; ++i){
-		LL exp_or = 0, exp_and = 0;
-		for(int j = 0; j < P; ++j){
-			if(in[i] >> j & 1){
-				exp_or += (1LL << j) % MX * n;
-				exp_and += (1LL << j) % MX * cnt[j];
-			}
-			else
-				exp_or += (1LL << j) % MX * cnt[j];
-		}
-		
-		exp_and %= MX, exp_or %= MX;
-		ans = (ans + 1LL * exp_or * exp_and) % MX;
-	}
-	
-	printf("%d\n", ans);
+void solve()
+{
+    int n;
+    cin >> n;
+    vi v(n);
+    vi cnt(60, 0);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> v[i];
+        for (int j = 0; j < 60; j++)
+        {
+            if (v[i] & (1LL << j))
+            {
+                cnt[j]++;
+                cnt[j] %= mod;
+            }
+        }
+    }
+    int ans = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int sum1 = 0;
+        int sum2 = 0;
+        for (int j = 0; j < 60; j++)
+        {
+            if (v[i] & (1LL << j))
+            {
+                sum1 += ((1LL << j) % mod) * cnt[j];
+                sum2 += ((1LL << j) % mod) * n;
+                sum1 %= mod;
+                sum2 %= mod;
+            }
+            else
+            {
+                sum2 += ((1LL << j) % mod) * cnt[j];
+                sum2 %= mod;
+            }
+        }
+        ans += (sum1 * sum2) % mod;
+        ans %= mod;
+    }
+    cout << ans % mod << '\n';
 }
-
-int main(){
-	int cases;
-	scanf("%d", &cases);
-	
-	while(cases--)
-		solve();
-	return 0;
+signed main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    int t = 1;
+    cin >> t;
+    while (t--)
+        solve();
+    return 0;
 }
+// Time Complexity: O(n * log(maxA))) where maxA is the maximum element in the array
+// Space Complexity: O(log(maxA)) for the count array

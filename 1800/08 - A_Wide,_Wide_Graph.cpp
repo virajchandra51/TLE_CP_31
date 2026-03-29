@@ -1,52 +1,79 @@
 #include <bits/stdc++.h>
-
-#define all(a) a.begin(), a.end()
-#define rall(a) a.rbegin(), a.rend()
-
 using namespace std;
 
-const int N = 1e5 + 228;
-
-vector<int> G[N];
-
-void dfs(int v, int par, int h, vector<int> &d) {
-    d[v] = h;
-    for (int i : G[v]) {
-        if (i != par) {
-            dfs(i, v, h + 1, d);
-        }
+vector<int> bfs(int src, const vector<vector<int>> &g)
+{
+    int n = g.size();
+    vector<int> dist(n, -1);
+    queue<int> q;
+    q.push(src);
+    dist[src] = 0;
+    while (!q.empty())
+    {
+        int u = q.front();
+        q.pop();
+        for (int v : g[u])
+            if (dist[v] == -1)
+            {
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
     }
+    return dist;
 }
 
-int main() {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
+// returns one endpoint of the diameter
+int find_farthest(int start, const vector<vector<int>> &g)
+{
+    auto dist = bfs(start, g);
+    return max_element(dist.begin(), dist.end()) - dist.begin();
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
     int n;
     cin >> n;
-    for (int i = 0; i < n - 1; ++i) {
-        int a, b;
-        cin >> a >> b;
-        G[a - 1].push_back(b - 1);
-        G[b - 1].push_back(a - 1);
+    vector<vector<int>> g(n);
+    for (int i = 0; i < n - 1; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+        --u;
+        --v;
+        g[u].push_back(v);
+        g[v].push_back(u);
     }
 
-    vector<int> d1(n), d2(n);
-    dfs(0, -1, 0, d1);
-    int a = max_element(all(d1)) - d1.begin();
-    dfs(a, -1, 0, d1);
-    int b = max_element(all(d1)) - d1.begin();
-    dfs(b, -1, 0, d2);
-    for (int i = 0; i < n; ++i) {
-        d2[i] = max(d2[i], d1[i]);
+    int A = find_farthest(0, g);
+    int B = find_farthest(A, g);
+    auto distA = bfs(A, g);
+    auto distB = bfs(B, g);
+
+    // group nodes by max(distA, distB)
+    vector<vector<int>> layer(n + 1);
+    for (int i = 0; i < n; i++)
+    {
+        int d = max(distA[i], distB[i]);
+        layer[d].push_back(i);
     }
-    sort(all(d2));
-    int ans = 0;
-    for (int i = 1; i <= n; ++i) {
-        while (ans < n && d2[ans] < i) {
-            ++ans;
-        }
-        cout << min(n, ans + 1) << ' ';
+
+    vector<int> ans(n + 1, 0);
+    vector<int> vis;
+    for (int i = n; i >= 1; i--)
+    {
+        vis.insert(vis.end(), layer[i].begin(), layer[i].end());
+        ans[i] = min(n, n - (int)vis.size() + 1);
     }
-    cout << '\n';
+
+    for (int i = 1; i <= n; i++)
+    {
+        cout << ans[i] << " ";
+    }
+    cout << "\n";
 }
+
+// Time complexity - O(n)
+// Space complexity - O(n)

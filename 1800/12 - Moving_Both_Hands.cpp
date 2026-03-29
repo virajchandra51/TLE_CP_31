@@ -1,96 +1,71 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+using ll = long long;
+const ll INF = 1e18;
+
 struct Edge {
     int to;
-    int weight;
-    bool dir;  // true = forward, false = backward
-};
-
-class Graph {
-public:
-    int n;
-    vector<vector<Edge>> adj;
-    vector<long long> dist;
-
-    Graph(int nodes) : n(nodes) {
-        adj.resize(n + 1);
-        dist.assign(n + 1, INF);
-    }
-
-    void add_edge(int u, int v, int w) {
-        adj[u].push_back({v, w, true});
-        adj[v].push_back({u, w, false});
-    }
-
-    void dijkstra(int root) {
-        dist[root] = 0;
-        vector<bool> vis(n + 1, false);
-        priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<>> pq;
-        pq.push({0, root});
-
-        // Phase 1: only forward edges
-        while (!pq.empty()) {
-            auto [d, u] = pq.top(); pq.pop();
-            if (vis[u]) continue;
-            vis[u] = true;
-
-            for (const auto& e : adj[u]) {
-                if (e.dir && dist[e.to] > dist[u] + e.weight) {
-                    dist[e.to] = dist[u] + e.weight;
-                    pq.push({dist[e.to], e.to});
-                }
-            }
-        }
-
-        // Phase 2: allow backward edges
-        fill(vis.begin(), vis.end(), false);
-        pq = {};
-        for (int i = 1; i <= n; ++i) {
-            pq.push({dist[i], i});
-        }
-
-        while (!pq.empty()) {
-            auto [d, u] = pq.top(); pq.pop();
-            if (vis[u]) continue;
-            vis[u] = true;
-
-            for (const auto& e : adj[u]) {
-                if (!e.dir && dist[e.to] > dist[u] + e.weight) {
-                    dist[e.to] = dist[u] + e.weight;
-                    pq.push({dist[e.to], e.to});
-                }
-            }
-        }
-
-        // Output distances from root to nodes 2...n
-        for (int i = 2; i <= n; ++i) {
-            if (dist[i] >= INF) cout << "-1 ";
-            else cout << dist[i] << " ";
-        }
-        cout << '\n';
-    }
-
-private:
-    const long long INF = 1e18;
+    ll w;
 };
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int n, m;
-    cin >> n >> m;
+    int N, M;
+    cin >> N >> M;
 
-    Graph g(n);
+    // adjacency list for 2*N vertices
+    vector<vector<Edge>> adj(2 * N + 1);
 
-    for (int i = 0; i < m; ++i) {
-        int u, v, w;
+    for (int i = 0; i < M; i++) {
+        int u, v;
+        ll w;
         cin >> u >> v >> w;
-        g.add_edge(u, v, w);
+
+        // original edge (layer 0)
+        adj[u].push_back({v, w});
+
+        // reversed edge (layer 1)
+        adj[v + N].push_back({u + N, w});
     }
 
-    g.dijkstra(1);
+    // 0-weight edges from (u,0) -> (u,1)
+    for (int u = 1; u <= N; u++) {
+        adj[u].push_back({u + N, 0});
+    }
 
-    return 0;
+    // Dijkstra
+    vector<ll> dist(2 * N + 1, INF);
+    priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<>> pq;
+
+    int start = 1; // (1,0)
+    dist[start] = 0;
+    pq.push({0, start});
+
+    while (!pq.empty()) {
+        auto [d, u] = pq.top();
+        pq.pop();
+
+        if (d != dist[u]) continue;
+
+        for (auto &e : adj[u]) {
+            if (dist[e.to] > d + e.w) {
+                dist[e.to] = d + e.w;
+                pq.push({dist[e.to], e.to});
+            }
+        }
+    }
+
+    // Output min(dist[u], dist[u+N]) for each node
+    for (int u = 2; u <= N; u++) {
+        ll ans = min(dist[u], dist[u + N]);
+        if (ans == INF) ans = -1; // unreachable
+        cout << ans << " ";
+    }
+    cout << "\n";
 }
+
+// Time Complexity: O((N + M) log (N))
+// Space Complexity: O(N + M)

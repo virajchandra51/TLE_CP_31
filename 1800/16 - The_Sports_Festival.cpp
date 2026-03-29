@@ -25,3 +25,5 @@ int main() {
 
     cout << dp(0, n - 1) << '\n';
 }
+// Time complexity - O(n^2)
+// Space complexity - O(n^2)

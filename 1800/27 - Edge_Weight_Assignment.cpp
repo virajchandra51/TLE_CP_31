@@ -1,62 +1,55 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define ll long long  
-#define pll pair<ll,ll>
-#define vi vector<ll> 
-#define vll vector<ll> 
-#define vpll vector<pair<ll,ll> >
-#define vvll vector<vector<ll> > 
-#define pb push_back
-#define fs first
-#define s second
-#define sz(x) (ll)(x).size()
-#define all(x) x.begin(), x.end()
-#define rall(x) x.rbegin(), x.rend()
-#define ios ios_base::sync_with_stdio(false);cin.tie(NULL)
-#define ld long double
-#define f(i, a, b) for (ll i = (a); i < (b); i++)
-#define fr(i, a, b) for (ll i = (a); i >= (b); i--)
-#define yay(a) if(a)cout<<"YES"<<endl; else cout<<"NO"<<endl;
-#define yes cout<<"YES"<<endl;
-#define no cout<<"NO"<<endl;
-#define mpll map<ll,ll>
-#define umpll unordered_map<ll,ll>
-#define nl cout<<endl;
-#define int long long
-ll md = 998244353, mx = 1e6 + 7, pr = 29, m9 = 1e9 + 7;
 
-pair<bool,bool> dfs(int node, int par, vvll& g, vll& maxx, bool& ok){
-    if(g[node].size()==1) return {1,0};
-    int count=0;
-    bool eve=0,odd=0;
-    for(auto& xx : g[node]){
-        if(xx==par) continue;
-        auto it=  dfs(xx,node,g,maxx,ok);
-        eve |= it.fs;
-        odd |= it.s;
-        if(g[xx].size()==1) count++;
+vector<vector<int>> g;
+vector<int> depth;
+int n;
+
+void dfs(int v, int p, int d){
+    depth[v] = d;
+    for(int to : g[v]){
+        if (to == p) continue;
+        dfs(to, v, d+1);
     }
-    if(eve&odd) ok=1;
-    if(count) maxx.pb(count);
-    return {odd,eve};
 }
-int32_t main() {
-    ios;
-    int n;
-    cin>>n;
-    vvll g(n+1);
-    int str=-1;
-    f(i,1,n){
-        int x,y;
-        cin>>x>>y;
-        g[x].pb(y); g[y].pb(x);
-        if(g[x].size()>=2) str =x;
-        if(g[y].size()>=2) str= y;
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    cin >> n;
+    g.assign(n+1, {});
+    depth.assign(n+1, 0);
+
+    for(int i=0;i<n-1;i++){
+        int a,b; cin>>a>>b;
+        g[a].push_back(b);
+        g[b].push_back(a);
     }
-    bool ok=0;
-    vll maxx;
-    auto pp = dfs(str,-1,g,maxx,ok);
-    auto sum = accumulate(all(maxx),0ll);
-    cout<<(ok ? 3 : 1)<<" "<< n-1 -sum + maxx.size()<<endl;
+
+    int root = 1;
+    for(int i=1;i<=n;i++) if(g[i].size()==1){ root=i; break; }
+
+    dfs(root, 0, 0);
+
+    int mn = 1;
+    for(int i=1;i<=n;i++){
+        if (g[i].size() == 1 && depth[i] & 1){
+            mn = 3; break;
+        }
+    }
+
+    int mx = n - 1;
+    for(int v=1; v<=n; v++){
+        int leafChild = 0;
+        for(int to : g[v]){
+            if (g[to].size() == 1) leafChild++;
+        }
+        if (leafChild > 1) mx -= (leafChild - 1);
+    }
+
+    cout << mn << " " << mx << "\n";
     return 0;
 }
+// TC: O(n)
+// SC: O(n)
